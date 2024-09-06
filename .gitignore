@@ -1,0 +1,20 @@
+# Node modules
+node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Environment variables
+.env
+config.env
+
+# Mac OS files
+.DS_Store
+
+# Dependency directories
+bower_components/
+
+# Debug log files
+*.log
