@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
-const { default: slugify } = require('slugify');
+const slugify = require('slugify');
+// const validator = require('validator');
 
 const tourSchema = new mongoose.Schema(
   {
@@ -10,6 +11,10 @@ const tourSchema = new mongoose.Schema(
       trim: true,
       maxLength: [40, 'A tour should have a name less oe equal 40'],
       minLength: [10, 'A tour should have a name more oe equal 10'],
+      //   validate: [
+      //     validator.isAlpha,
+      //     'A tour name should only contains letters and not digits',
+      //   ],
     },
     slug: String,
     rating: {
@@ -30,7 +35,7 @@ const tourSchema = new mongoose.Schema(
           // DOCUMENT MIDLEWARE RUNS ONLY BEFORE .save and .create
           return val < this.price;
         },
-        message: 'he priceDiscount ({VALUE}) cannot be greater than price',
+        message: 'The priceDiscount ({VALUE}) cannot be greater than price',
       },
     },
     duration: {
