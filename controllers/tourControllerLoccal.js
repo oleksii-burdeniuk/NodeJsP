@@ -1,31 +1,7 @@
 const fs = require('fs');
-const Tour = require('../models/tourModel');
 
 const toursSimplePath = `${__dirname}/../dev-data/data/tours-simple.json`;
 const tours = JSON.parse(fs.readFileSync(toursSimplePath));
-
-exports.checkBody = (req, res, next) => {
-  if (!req.body.name || !req.body.price) {
-    return res
-      .status(400)
-      .json({ status: 'fail', message: 'Name or price is not defined' });
-  }
-
-  next();
-};
-
-exports.checkId = (req, res, next, val) => {
-  const id = val;
-  const tour = tours.find((item) => +item.id === +id);
-
-  if (!tour) {
-    return res
-      .status(404)
-      .json({ status: 'fail', message: 'Cant find that tour' });
-  }
-
-  next();
-};
 
 exports.getTour = (req, res) => {
   const { id } = req.params;
