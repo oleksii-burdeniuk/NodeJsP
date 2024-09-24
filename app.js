@@ -10,6 +10,8 @@ const AppError = require('./utils/appError');
 
 const tourRouter = require('./routs/tourRouts');
 const userRouter = require('./routs/userRouts');
+const reviewRouter = require('./routs/reviewRouts');
+
 const errorController = require('./controllers/errorController');
 
 const app = express();
@@ -51,9 +53,11 @@ app.use((req, res, next) => {
 
 const toursUrl = '/api/v1/tours';
 const usersUrl = '/api/v1/users';
+const reviewsUrl = '/api/v1/reviews';
 
 app.use(usersUrl, userRouter);
 app.use(toursUrl, tourRouter);
+app.use(reviewsUrl, reviewRouter);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`can't find ${req.originalUrl} on this server!`, 404));
