@@ -2,6 +2,8 @@ const fs = require('fs');
 
 const mongoose = require('mongoose');
 const Tour = require('../../models/tourModel');
+const Review = require('../../models/reviewModel');
+const User = require('../../models/userModel');
 
 const dotenv = require('dotenv');
 
@@ -23,6 +25,10 @@ mongoose
 // read file
 
 const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`, 'utf-8'));
+const users = JSON.parse(fs.readFileSync(`${__dirname}/users.json`, 'utf-8'));
+const reviews = JSON.parse(
+  fs.readFileSync(`${__dirname}/reviews.json`, 'utf-8'),
+);
 
 // import data to db
 
@@ -30,6 +36,8 @@ const importData = async () => {
   console.log('importData');
   try {
     await Tour.create(tours);
+    await Review.create(reviews);
+    await User.create(users, { validateBeforeSave: false });
     console.log('all was uploaded');
   } catch (err) {
     console.log('Error:', err);
@@ -41,6 +49,8 @@ const importData = async () => {
 const deleteData = async () => {
   try {
     await Tour.deleteMany();
+    await User.deleteMany();
+    await Review.deleteMany();
     console.log('all was deleted');
   } catch (err) {
     console.log('Error:', err);

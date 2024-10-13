@@ -10,6 +10,7 @@ const {
   deleteUser,
   updateMe,
   deleteMe,
+  getMe,
 } = usersController;
 const {
   sighUp,
@@ -18,25 +19,25 @@ const {
   resetPassword,
   protect,
   updatePassword,
+  restrictTo,
 } = authController;
 // '/api/v1/users'
 const router = express.Router();
 
 router.post('/signup', sighUp);
 router.post('/login', login);
-
-router.patch('/updatePassword', protect, updatePassword);
 router.post('/forgotPassword', forgotPassword);
 router.patch('/resetPassword/:token', resetPassword);
-router.patch('/updateMe', protect, updateMe);
-router.delete('/deleteMe', protect, deleteMe);
 
-router.route('/').get(protect, getAllUsers).post(protect, createUser);
+// protect all routs after
+router.use(protect);
+router.patch('/updatePassword', updatePassword);
+router.patch('/updateMe', updateMe);
+router.delete('/deleteMe', deleteMe);
+router.get('/me', getMe, getUser);
 
-router
-  .route('/:id')
-  .get(getUser)
-  .patch(protect, updateUser)
-  .delete(protect, deleteUser);
+router.use(restrictTo('admin'));
+router.route('/').get(getAllUsers).post(createUser);
+router.route('/:id').get(getUser).patch(updateUser).delete(deleteUser);
 
 module.exports = router;
