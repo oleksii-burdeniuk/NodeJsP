@@ -1,3 +1,4 @@
+const path = require('path');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const express = require('express');
@@ -11,10 +12,17 @@ const AppError = require('./utils/appError');
 const tourRouter = require('./routs/tourRouts');
 const userRouter = require('./routs/userRouts');
 const reviewRouter = require('./routs/reviewRouts');
+const viewRouter = require('./routs/viewRoutes');
 
 const errorController = require('./controllers/errorController');
 
 const app = express();
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
+
+// app.use(express.static(`${__dirname}/public`));
+app.use(express.static(path.join(__dirname, 'public')));
+
 app.use(helmet());
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
@@ -43,18 +51,23 @@ app.use(xss());
 //   }),
 // );
 
-app.use(express.static(`${__dirname}/public`));
-
 //TEST MIDDLEWARE
 app.use((req, res, next) => {
   req.requestTime = Date.now();
   next();
 });
 
+// ROUTES
+
+// app.get('/', (req, res) => {
+//   res.status(200).render('base');
+// });
+
 const toursUrl = '/api/v1/tours';
 const usersUrl = '/api/v1/users';
 const reviewsUrl = '/api/v1/reviews';
 
+app.use('/', viewRouter);
 app.use(usersUrl, userRouter);
 app.use(toursUrl, tourRouter);
 app.use(reviewsUrl, reviewRouter);
