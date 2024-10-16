@@ -1,6 +1,9 @@
 const express = require('express');
 const usersController = require('../controllers/userController');
 const authController = require('../controllers/authController');
+const multer = require('multer');
+
+const upload = multer({ dest: 'public/img/users' });
 
 const {
   getAllUsers,

@@ -5,6 +5,7 @@ const express = require('express');
 const morgan = require('morgan');
 const xss = require('xss-clean');
 const mongoSanitize = require('express-mongo-sanitize');
+const cors = require('cors');
 // const hpp = require('hpp');
 
 const AppError = require('./utils/appError');
@@ -20,10 +21,28 @@ const app = express();
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
+app.use(cors());
+app.options('*', cors());
+// Access-Control-Allow-Origin *
 // app.use(express.static(`${__dirname}/public`));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: [
+          "'self'",
+          'https://js.stripe.com',
+          'https://api.mapbox.com',
+        ],
+        styleSrc: ["'self'", 'https://api.mapbox.com'], // For mapbox CSS if needed
+        frameSrc: ["'self'", 'https://js.stripe.com'],
+      },
+    },
+  }),
+);
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
