@@ -3,9 +3,8 @@ include _reviewCard
 
 block append head
   //- script(src='https://api.mapbox.com/mapbox-gl-js/v0.54.0/mapbox-gl.js')
-  
-  script(src='js/mapbox.js')
-  //- link(href='https://api.mapbox.com/mapbox-gl-js/v0.54.0/mapbox-gl.css' rel='stylesheet')
+  script(src='/js/mapbox.js')
+  link(href='https://api.mapbox.com/mapbox-gl-js/v0.54.0/mapbox-gl.css' rel='stylesheet')
 
 mixin overviewBox(label, text, icon)
   .overview-box__detail
@@ -20,7 +19,7 @@ block content
       .header__hero-overlay &nbsp;
       img.header__hero-img(src=`/img/tours/${tour.imageCover}`, alt=`${tour.name}`)
 
-    .heading-boxw
+    .heading-box
       h1.heading-primary
         span= `${tour.name} tour`
       .heading-box__group

@@ -6,6 +6,7 @@ const morgan = require('morgan');
 const xss = require('xss-clean');
 const mongoSanitize = require('express-mongo-sanitize');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 // const hpp = require('hpp');
 
 const AppError = require('./utils/appError');
@@ -56,6 +57,7 @@ app.use('/api', limiter);
 
 //  BODY PARSER, LIMITING DATA SEND THRO BODY
 app.use(express.json({ limit: '10kb' }));
+app.use(cookieParser());
 
 // PREVENT PASSING   {"$gt":""} TO GET ACCESS TO USER
 app.use(mongoSanitize());
@@ -73,6 +75,7 @@ app.use(xss());
 //TEST MIDDLEWARE
 app.use((req, res, next) => {
   req.requestTime = Date.now();
+  console.log('req.cookies', req.cookies);
   next();
 });
 

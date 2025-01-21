@@ -79,14 +79,22 @@ exports.sighUp = catchAsync(async (req, res, next) => {
 
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
-  // if (typeof email !== 'string')
-  //   return next(new AppError('Please provide email and password', 400));
+  if (typeof email !== 'string')
+    return next(new AppError('Please provide email and password', 400));
 
   const user = await User.findOne({ email }).select('+password');
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError('Incorrect email or password', 401));
   }
   createSendToken(user, 200, res);
+});
+
+exports.logout = catchAsync(async (req, res, next) => {
+  res.cookie('jwt', 'LoggedOut', {
+    expires: new Date(Date.now + 10 * 1000),
+    httpOnly: true,
+  });
+  res.status(200).json({ status: 'success' });
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -96,6 +104,8 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
   if (!token)
     return next(

@@ -23,12 +23,14 @@ const {
   protect,
   updatePassword,
   restrictTo,
+  logout,
 } = authController;
 // '/api/v1/users'
 const router = express.Router();
 
 router.post('/signup', sighUp);
 router.post('/login', login);
+router.post('/logOut', logout);
 router.post('/forgotPassword', forgotPassword);
 router.patch('/resetPassword/:token', resetPassword);
 
