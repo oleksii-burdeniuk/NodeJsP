@@ -15,6 +15,8 @@ const {
   getMonthlyPlan,
   getToursWithin,
   getDistances,
+  uploadTourImages,
+  resizeTourImages,
 } = tourController;
 
 // '/api/v1/tours'
@@ -38,7 +40,13 @@ router.route('/').get(getAllTours).post(protect, createTour);
 router
   .route('/:id')
   .get(getTour)
-  .patch(protect, restrictTo('admin'), updateTour)
+  .patch(
+    protect,
+    restrictTo('admin'),
+    uploadTourImages,
+    resizeTourImages,
+    updateTour,
+  )
   .delete(protect, restrictTo('admin'), deleteTour);
 
 module.exports = router;

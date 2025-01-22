@@ -626,11 +626,11 @@ if (userDataForm) userDataForm.addEventListener('submit', (e)=>{
     const name = document.getElementById('name').value;
     const email = document.getElementById('email').value;
     const photo = document.getElementById('photo').files[0];
-    (0, _updateSettings.updateSettings)({
-        name,
-        email,
-        photo
-    }, 'data');
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('email', email);
+    formData.append('photo', photo);
+    (0, _updateSettings.updateSettings)(formData, 'data');
 });
 if (userPasswordForm) userPasswordForm.addEventListener('submit', async (e)=>{
     e.preventDefault();
