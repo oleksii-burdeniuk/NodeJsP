@@ -90,11 +90,14 @@ exports.login = catchAsync(async (req, res, next) => {
 });
 
 exports.logout = catchAsync(async (req, res, next) => {
-  res.cookie('jwt', 'LoggedOut', {
-    expires: new Date(Date.now + 10 * 1000),
+  res.cookie('jwt', '', {
+    expires: new Date(Date.now() + 10 * 1000),
     httpOnly: true,
   });
-  res.status(200).json({ status: 'success' });
+
+  res.status(200).json({
+    status: 'success',
+  });
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -201,18 +204,19 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
-  const { newPassword, newPasswordConfirm, password } = req.body;
+  const { password, passwordConfirm, passwordCurrent } = req.body;
+  console.log('req.body', req.body);
 
-  if (!newPasswordConfirm || !password || !newPassword)
+  if (!passwordConfirm || !password || !passwordCurrent)
     return next(new AppError('Please provide old and new password', 400));
 
   const user = await User.findById(req.user._id).select('+password');
-  if (!user || !(await user.correctPassword(password, user.password))) {
+  if (!user || !(await user.correctPassword(passwordCurrent, user.password))) {
     return next(new AppError('Incorrect password', 401));
   }
 
-  user.password = newPassword;
-  user.passwordConfirm = newPasswordConfirm;
+  user.password = password;
+  user.passwordConfirm = passwordConfirm;
 
   const newUser = await user.save();
   createSendToken(newUser, 200, res);

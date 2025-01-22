@@ -1,24 +1,39 @@
 const AppError = require('../utils/appError');
 
-const sendErrorDev = (err, res) => {
-  res.status(err.statusCode).json({
-    status: err.status,
-    message: err.message,
-    stack: err.stack,
-    error: err,
-  });
-};
-const sendErrorProd = (err, res) => {
-  if (err.isOperational) {
+const sendErrorDev = (err, req, res) => {
+  if (req.originalUrl.startsWith('/api')) {
     res.status(err.statusCode).json({
       status: err.status,
       message: err.message,
+      stack: err.stack,
+      error: err,
     });
   } else {
-    console.error('ERROR', err);
-    res.status(500).json({
-      status: 'error',
-      message: 'something went very wrong!',
+    res.status(err.statusCode).render('error', {
+      title: 'Something went wrong!',
+      msg: err.message,
+    });
+  }
+};
+
+const sendErrorProd = (err, req, res) => {
+  if (req.originalUrl.startsWith('/api')) {
+    if (err.isOperational) {
+      res.status(err.statusCode).json({
+        status: err.status,
+        message: err.message,
+      });
+    } else {
+      console.error('ERROR', err);
+      res.status(500).json({
+        status: 'error',
+        message: 'something went very wrong!',
+      });
+    }
+  } else {
+    res.status(err.statusCode).render('error', {
+      title: 'Something went wrong!',
+      msg: err.message,
     });
   }
 };
@@ -57,7 +72,7 @@ const errorController = (err, req, res, next) => {
   err.status = err.status || 'error';
 
   if (process.env.NODE_ENV === 'development') {
-    sendErrorDev(err, res);
+    sendErrorDev(err, req, res);
   } else if (process.env.NODE_ENV === 'production') {
     let error = { ...err };
     if (err.name === 'CastError') {
@@ -76,7 +91,7 @@ const errorController = (err, req, res, next) => {
       error = handleTokenExpiredError();
     }
 
-    sendErrorProd(error, res);
+    sendErrorProd(error, req, res);
   }
 };
 module.exports = errorController;

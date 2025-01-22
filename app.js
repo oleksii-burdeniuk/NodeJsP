@@ -75,7 +75,6 @@ app.use(xss());
 //TEST MIDDLEWARE
 app.use((req, res, next) => {
   req.requestTime = Date.now();
-  console.log('req.cookies', req.cookies);
   next();
 });
 

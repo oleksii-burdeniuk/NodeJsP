@@ -28,12 +28,14 @@ export const login = async (email, password) => {
 export const logout = async () => {
   try {
     const res = await axios({
-      method: 'GET',
+      method: 'POST',
       url: '/api/v1/users/logout',
     });
-    if ((res.data.status = 'success')) location.reload(true);
+    if (res.data.status === 'success') {
+      location.reload(true); // Reload the page to reflect logout
+    }
   } catch (err) {
-    console.log(err.response);
+    console.log(err);
     showAlert('error', 'Error logging out! Try again.');
   }
 };
