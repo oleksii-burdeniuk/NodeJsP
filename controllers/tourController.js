@@ -50,7 +50,7 @@ exports.resizeTourImages = catchAsync(async (req, res, next) => {
       await sharp(file.buffer)
         .resize(2000, 1333)
         .toFormat('jpeg')
-        .jpeg({ quality: 10 })
+        .jpeg({ quality: 20 })
         .toFile(`public/img/tours/${filename}`);
 
       req.body.images.push(filename);
@@ -154,7 +154,7 @@ exports.getToursWithin = catchAsync(async (req, res, next) => {
   const [lat, lng] = latlng.split(',');
 
   const radius = unit === 'mi' ? distance / 3963.2 : distance / 6378.1;
-  console.log(radius);
+  // console.log(radius);
   if (!lat || !lng)
     next(
       new AppError(

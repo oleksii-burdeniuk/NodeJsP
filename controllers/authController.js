@@ -205,7 +205,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
   const { password, passwordConfirm, passwordCurrent } = req.body;
-  console.log('req.body', req.body);
+  // console.log('req.body', req.body);
 
   if (!passwordConfirm || !password || !passwordCurrent)
     return next(new AppError('Please provide old and new password', 400));

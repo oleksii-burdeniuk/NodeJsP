@@ -8,6 +8,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 // const hpp = require('hpp');
+const compression = require('compression');
 
 const AppError = require('./utils/appError');
 
@@ -93,6 +94,7 @@ app.use(usersUrl, userRouter);
 app.use(toursUrl, tourRouter);
 app.use(reviewsUrl, reviewRouter);
 
+app.use(compression());
 app.all('*', (req, res, next) => {
   next(new AppError(`can't find ${req.originalUrl} on this server!`, 404));
 });

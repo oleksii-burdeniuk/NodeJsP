@@ -1,6 +1,6 @@
 // /* eslint-disable */
 
-console.log('hello from js mapbox');
+// console.log('hello from js mapbox');
 
 // export const displayMap = locations => {
 //   mapboxgl.accessToken =

@@ -4,7 +4,7 @@ import { showAlert } from './alerts';
 
 // type is either 'password' or 'data'
 export const updateSettings = async (data, type) => {
-  console.log('updateSettings data', data);
+  // console.log('updateSettings data', data);
   try {
     const url =
       type === 'password'
