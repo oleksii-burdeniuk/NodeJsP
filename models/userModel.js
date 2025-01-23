@@ -45,7 +45,10 @@ const userSchema = new mongoose.Schema(
         message: `The confirmation password is not correct:  ({VALUE})`,
       },
     },
-    photo: String,
+    photo: {
+      type: String,
+      default: 'default.jpg',
+    },
     passwordChangedAt: {
       type: Date,
     },

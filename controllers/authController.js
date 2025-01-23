@@ -13,6 +13,36 @@ const signToken = (id) => {
   return token;
 };
 
+exports.isLoggedIn = async (req, res, next) => {
+  if (req.cookies?.jwt) {
+    try {
+      // 1) verify token
+      const decoded = await promisify(jwt.verify)(
+        req.cookies?.jwt,
+        process.env.JWT_SECRET,
+      );
+
+      // 2) Check if user still exists
+      const currentUser = await User.findById(decoded.id);
+      if (!currentUser) {
+        return next();
+      }
+
+      // 3) Check if user changed password after the token was issued
+      if (currentUser.changedPasswordAfter(decoded.iat)) {
+        return next();
+      }
+
+      // THERE IS A LOGGED IN USER
+      res.locals.user = currentUser;
+      return next();
+    } catch (err) {
+      return next();
+    }
+  }
+  next();
+};
+
 const createSendToken = (user, statusCode, res) => {
   const cookieOptions = {
     expires: new Date(
@@ -49,14 +79,25 @@ exports.sighUp = catchAsync(async (req, res, next) => {
 
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
-  // if (typeof email !== 'string')
-  //   return next(new AppError('Please provide email and password', 400));
+  if (typeof email !== 'string')
+    return next(new AppError('Please provide email and password', 400));
 
   const user = await User.findOne({ email }).select('+password');
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError('Incorrect email or password', 401));
   }
   createSendToken(user, 200, res);
+});
+
+exports.logout = catchAsync(async (req, res, next) => {
+  res.cookie('jwt', '', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+
+  res.status(200).json({
+    status: 'success',
+  });
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -66,6 +107,8 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
   if (!token)
     return next(
@@ -161,18 +204,19 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
-  const { newPassword, newPasswordConfirm, password } = req.body;
+  const { password, passwordConfirm, passwordCurrent } = req.body;
+  // console.log('req.body', req.body);
 
-  if (!newPasswordConfirm || !password || !newPassword)
+  if (!passwordConfirm || !password || !passwordCurrent)
     return next(new AppError('Please provide old and new password', 400));
 
   const user = await User.findById(req.user._id).select('+password');
-  if (!user || !(await user.correctPassword(password, user.password))) {
+  if (!user || !(await user.correctPassword(passwordCurrent, user.password))) {
     return next(new AppError('Incorrect password', 401));
   }
 
-  user.password = newPassword;
-  user.passwordConfirm = newPasswordConfirm;
+  user.password = password;
+  user.passwordConfirm = passwordConfirm;
 
   const newUser = await user.save();
   createSendToken(newUser, 200, res);
